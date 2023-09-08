@@ -1,19 +1,22 @@
 """
 updateData
-
-ToDo
-一次下載幾個常用的
-把上市上櫃的代號資料存下來
-
-檢查有沒有下載過，不是最新的資料就下載補進去
+檢查資料並補充最新資料
+用股票代號查詢名稱
 """
 import datetime
 import os
 import yfinance as yf
 import pandas as pd
+import requests
+import re
 
 
-def stock_data(stock_id):
+def stock_data(stock_id:str):
+    """
+    下載該代號的所有歷史交易數據
+    :param stock_id: 股票代號
+    :return: 股票資料dataframe
+    """
     today = datetime.date.today()
     tomarrow = today + datetime.timedelta(days=1)
     address = stock_id + ".csv"
@@ -39,4 +42,37 @@ def stock_data(stock_id):
         return df
 
 
-#df = stock_data("2330", datetime.date.today())
+def searchStock(target:str):
+    """
+    下載代號和名稱的對照表並存起來
+    不會自動更新存好的檔案，每次都要下載太久了
+    :param target: 股票代號
+    :return: 股票名稱
+    """
+    if not os.path.isfile("name.csv"):
+        res = requests.get("https://isin.twse.com.tw/isin/C_public.jsp?strMode=2")
+        df = pd.read_html(res.text)[0]
+        # 設定column名稱
+        df.columns = df.iloc[0]
+        # 刪除第一行
+        df = df.iloc[2:]
+        df = df.dropna(thresh=3, axis=0).drop("CFICode", axis=1)
+        df = df.drop("備註", axis=1)
+        df = df.drop("國際證券辨識號碼(ISIN Code)", axis=1)
+        df = df.drop("上市日", axis=1)
+        df.columns = ['有價證券代號及名稱', '市場別', '產業別']
+        df[['有價證券代號', '名稱']] = df['有價證券代號及名稱'].str.extract(r'(\S+)\s+(\S+)')
+        df.drop('有價證券代號及名稱', axis=1, inplace=True)
+        # 重置索引
+        df.reset_index(drop=True, inplace=True)
+        df = df.set_index('有價證券代號')
+        #df = df.drop('Unnamed: 0', axis=1)
+        df = df[['名稱', '市場別', '產業別']]
+        df.to_csv("name.csv")
+    else:
+        df = pd.read_csv("name.csv")
+        df = df.set_index('有價證券代號')
+        print("")
+    result = df.loc[target, '名稱']
+    print(result)
+    return result
