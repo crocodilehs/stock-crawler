@@ -11,7 +11,7 @@ import requests
 import re
 
 
-def stock_data(stock_id:str):
+def stockData(stock_id: str):
     """
     下載該代號的所有歷史交易數據
     :param stock_id: 股票代號
@@ -42,7 +42,7 @@ def stock_data(stock_id:str):
         return df
 
 
-def searchStock(target:str):
+def searchStock(target: str):
     """
     下載代號和名稱的對照表並存起來
     不會自動更新存好的檔案，每次都要下載太久了
@@ -74,5 +74,5 @@ def searchStock(target:str):
         df = df.set_index('有價證券代號')
         print("")
     result = df.loc[target, '名稱']
-    print(result)
+
     return result

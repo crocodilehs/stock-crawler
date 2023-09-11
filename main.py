@@ -10,12 +10,11 @@ import warnings
 def main(target_stock):
     warnings.filterwarnings('ignore')
     name = updateData.searchStock(target_stock)
-    df = updateData.stock_data(target_stock)
-    df = indicator.RSI(df, 14)
+    df = updateData.stockData(target_stock)
+    #df = indicator.RSI(df, 14)
+    print(f'現在查的是: {name}')
     # 畫K線
     title = f'{name} {target_stock}'
-
-    #font={'font.family': 'Microsoft JhengHei'}
 
     # 把綠漲紅跌改成紅漲綠跌
     mc = mpf.make_marketcolors(up='r', down='g', inherit=True)
@@ -23,22 +22,26 @@ def main(target_stock):
 
     # 畫其中一段時間
     #draw_period = True
-    start = '2023-01-01'
-    end = '2023-08-21'
+    start = '2023-06-05'
+    end = '2023-09-12'
     tdf = df.loc[start:end,:]
+    tdf = indicator.RSI(tdf, 14)
     tdf = indicator.ATR(tdf)
     tdf = indicator.MACD(tdf)
     tdf = indicator.KD(tdf)
-
+    """
+    panel: 畫在第幾張畫布上
+    label: 圖例
+    """
     add_plots = {
-        "RSI": mpf.make_addplot(tdf['RSI'], panel=0, ylabel='RSI', color='purple'),
-        "ATR": mpf.make_addplot(tdf['ATR'], panel=2, ylabel='ATR'),
+        "RSI": mpf.make_addplot(tdf['RSI'], panel=0, ylabel='RSI', color='purple', label="RSI"),
+        "ATR": mpf.make_addplot(tdf['ATR'], panel=2, ylabel='ATR', label="ATR"),
         "hist": mpf.make_addplot(tdf['MACDhist'], type='bar', width=0.7, panel=3,
                              color='dimgray', alpha=1, secondary_y=False),
         "MACD": mpf.make_addplot(tdf['MACD'], panel=3, color='fuchsia', secondary_y=True, ylabel='MACD', label="MACD"),
         "singal": mpf.make_addplot(tdf['MACDsingal'], panel=3, color='b', secondary_y=True, label="singal"),
-        "slowk": mpf.make_addplot(tdf['slowk'], panel=4, ylabel='KD'),
-        "slowd": mpf.make_addplot(tdf['slowd'], panel=4)
+        "slowk": mpf.make_addplot(tdf['slowk'], panel=4, ylabel='KD', label="K"),
+        "slowd": mpf.make_addplot(tdf['slowd'], panel=4, label="D")
     }
     """
     figratio: 圖的大小
@@ -52,9 +55,6 @@ def main(target_stock):
     # 改字體讓中文可以顯示
     fig.suptitle(title, fontfamily='Microsoft JhengHei')
     # 圖例
-    axes[1].legend([None]*(len(add_plots)+2))
-    handles = axes[1].get_legend().legend_handles
-    axes[1].legend(handles=handles,labels=list(add_plots.keys()))
     axes[2].set_ylabel("Volume")
     mpf.show()
 
