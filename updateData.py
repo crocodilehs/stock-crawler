@@ -74,7 +74,8 @@ def searchStock(target: str):
     else:
         df = pd.read_csv("name.csv")
         df = df.set_index('有價證券代號')
-        print("")
+
+    target = target.replace(".TW", "")
     result = df.loc[target, '名稱']
 
     return result

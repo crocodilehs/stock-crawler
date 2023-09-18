@@ -6,6 +6,7 @@ import mplfinance as mpf
 import indicator
 import updateData
 import warnings
+import datetime
 
 def main(target_stock):
     warnings.filterwarnings('ignore')
@@ -24,7 +25,7 @@ def main(target_stock):
     df = indicator.KD(df)
     # 畫其中一段時間
     start = '2023-06-05'
-    end = '2023-09-12'
+    end = datetime.date.today()
     tdf = df.loc[start:end,:]
 
     """
@@ -64,5 +65,5 @@ def main(target_stock):
 
 
 if __name__ == "__main__":
-    #main("2330.TW")
+    main("2330.TW")
     main("AAPL")
