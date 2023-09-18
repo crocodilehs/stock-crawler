@@ -4,6 +4,7 @@ Indicator
 """
 
 from talib import abstract
+import talib
 
 
 def RSI(df, period):
@@ -26,10 +27,9 @@ def KD(df):
   df.rename(columns={'close':'Close', 'high':'High', 'low':'Low'}, inplace = True)
   return df
 
-def ATR(df):
+def BBANDS(df):
   df.rename(columns={'Close':'close', 'High':'high', 'Low':'low'}, inplace = True)
-  df['ATR'] = abstract.ATR(df)
-
+  df["upper"], df["middle"], df["lower"] = talib.BBANDS(df["close"], timeperiod=20, nbdevup=2.1, nbdevdn=2.1, matype=0)
   df.rename(columns={'close':'Close', 'high':'High', 'low':'Low'}, inplace = True)
   return df
 

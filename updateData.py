@@ -25,7 +25,7 @@ def stockData(stock_id: str):
 
         end = datetime.datetime.strptime(str(today), '%Y-%m-%d')
         # 下載缺少的資料
-        df = yf.download(stock_id + ".TW", start=df_new.index[-1], end=tomarrow)
+        df = yf.download(stock_id, start=df_new.index[-1], end=tomarrow)
         if end not in df_new.index:
             # 合併新資料到舊資料然後存檔
             df_new = pd.concat([df_new, df])
@@ -36,7 +36,7 @@ def stockData(stock_id: str):
             print("已是最新資料，無需更新")
             return df_new
     else:
-        df = yf.download(stock_id + ".TW", end=tomarrow)
+        df = yf.download(stock_id, end=tomarrow)
         df.to_csv(address, encoding='utf-8')
         print("此為新資料，已建立csv檔")
         return df
@@ -49,6 +49,8 @@ def searchStock(target: str):
     :param target: 股票代號
     :return: 股票名稱
     """
+    if ".TW" not in target:
+        return ""
     if not os.path.isfile("name.csv"):
         res = requests.get("https://isin.twse.com.tw/isin/C_public.jsp?strMode=2")
         df = pd.read_html(res.text)[0]
