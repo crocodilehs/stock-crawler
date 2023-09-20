@@ -1,7 +1,3 @@
-"""
-TODO
-現在固定畫一段時間
-"""
 import mplfinance as mpf
 import indicator
 import updateData
