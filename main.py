@@ -19,8 +19,8 @@ def main(target_stock):
     df = indicator.BBANDS(df)
     df = indicator.MACD(df)
     df = indicator.KD(df)
-    # 畫其中一段時間
-    start = '2023-06-05'
+    # 畫過去半年的圖
+    start = datetime.date.today()-datetime.timedelta(days=180)
     end = datetime.date.today()
     tdf = df.loc[start:end,:]
 
@@ -61,5 +61,5 @@ def main(target_stock):
 
 
 if __name__ == "__main__":
-    main("2330.TW")
-    main("AAPL")
+    target = input("Enter the stock code you want to search: ")
+    main(target)

@@ -8,12 +8,11 @@ import os
 import yfinance as yf
 import pandas as pd
 import requests
-import re
 
 
 def stockData(stock_id: str):
     """
-    下載該代號的所有歷史交易數據
+    下載該代號過去一年的歷史交易數據
     :param stock_id: 股票代號
     :return: 股票資料dataframe
     """
@@ -22,7 +21,6 @@ def stockData(stock_id: str):
     address = stock_id + ".csv"
     if os.path.isfile(address):
         df_new = pd.read_csv(address, index_col="Date", parse_dates=["Date"])
-
         end = datetime.datetime.strptime(str(today), '%Y-%m-%d')
         # 下載缺少的資料
         df = yf.download(stock_id, start=df_new.index[-1], end=tomarrow)
@@ -36,7 +34,8 @@ def stockData(stock_id: str):
             print("已是最新資料，無需更新")
             return df_new
     else:
-        df = yf.download(stock_id, end=tomarrow)
+        start = datetime.date.today() - datetime.timedelta(days=365)
+        df = yf.download(stock_id, start=start, end=tomarrow)
         df.to_csv(address, encoding='utf-8')
         print("此為新資料，已建立csv檔")
         return df
@@ -44,8 +43,8 @@ def stockData(stock_id: str):
 
 def searchStock(target: str):
     """
-    下載代號和名稱的對照表並存起來
-    不會自動更新存好的檔案，每次都要下載太久了
+    下載代號和名稱的對照表存起來
+    不會自動更新存好的對照表，每次都要下載太久了
     :param target: 股票代號
     :return: 股票名稱
     """
